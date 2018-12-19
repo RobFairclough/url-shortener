@@ -28,3 +28,5 @@ path /api/shorturl/:shorturl
 read json, search for a file with the short url given
 redirect to original url in that file if found
 else 404 {no short url found }
+
+TODO add frontend

@@ -27,21 +27,32 @@ exports.makeNewLink = (url, cb) => {
     // array of stored urls
     const file = JSON.parse(data);
     // if already exists
-    let urlCheck = url.startsWith("http") ? url : `https://${url}`;
+    let urlCheck =
+      url.startsWith("http://") || url.startsWith("https://")
+        ? url
+        : `https://${url}`;
     const found = file.find(shorturl => shorturl.original_url === urlCheck);
     if (found) {
       // return the already existing shortened url json through callback
-      cb(null, found);
+      cb(
+        null,
+        `https://robfairclough-url-shortener.glitch.me/api/shorturl/${
+          found.short_url
+        }`
+      );
     } else {
+      console.log(urlCheck);
       // verify that the link is functional
-      dns.lookup(url, (err, address, family) => {
-        console.log(address, family);
+      dns.lookup(urlCheck.split("//")[1], (err, address, family) => {
         //if valid
-        if (family === 4 || family === 6) {
+        console.log(err);
+        console.log(address, family);
+        if (!err) {
           // add new link json to file
+          const short_url = file.length + 1;
           const obj = {
             original_url: urlCheck,
-            short_url: file.length + 1
+            short_url
           };
           file.push(obj);
           // rewrite file including new json
@@ -50,7 +61,11 @@ exports.makeNewLink = (url, cb) => {
             JSON.stringify(file, null, 2),
             err => {
               if (err) cb(err);
-              else cb(null, "done");
+              else
+                cb(
+                  null,
+                  `https://robfairclough-url-shortener.glitch.me/api/shorturl/${short_url}`
+                );
             }
           );
         } else {

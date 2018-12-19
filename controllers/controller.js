@@ -1,10 +1,10 @@
-const { getRedirect, makeNewLink } = require("../models/model");
+const { getRedirect, makeNewLink, getAll } = require("../models/model");
 
 // get shortened link
 const sendRedirect = (req, res, next) => {
   getRedirect(req.params.shorturl, (err, link) => {
     if (err) next(err);
-    else res.send(link);
+    else res.status(302).redirect(link);
   });
 };
 // create new shortened link
@@ -17,4 +17,11 @@ const sendNew = (req, res, next) => {
   } else next({ status: 400, error: "no url found in POST request" });
 };
 
-module.exports = { sendRedirect, sendNew };
+const sendAll = (req, res, next) => {
+  getAll((err, done) => {
+    if (err) next(err);
+    else res.send(done);
+  });
+};
+
+module.exports = { sendRedirect, sendNew, sendAll };
